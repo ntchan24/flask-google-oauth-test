@@ -1,0 +1,157 @@
+Flask Google OAuth Setup Guide
+Step 1: Set Up Google OAuth Credentials
+1.1 Go to Google Cloud Console
+
+Visit Google Cloud Console
+Sign in with your Google account
+
+1.2 Create a New Project (or select existing)
+
+Click on the project dropdown at the top
+Click "New Project"
+Name it something like "Flask OAuth Test"
+Click "Create"
+
+1.3 Enable Google+ API
+
+In the left sidebar, go to "APIs & Services" → "Library"
+Search for "Google+ API"
+Click on it and press "Enable"
+Also enable "Google Identity" if available
+
+1.4 Create OAuth Credentials
+
+Go to "APIs & Services" → "Credentials"
+Click "Create Credentials" → "OAuth client ID"
+If prompted, configure the OAuth consent screen first:
+
+Choose "External" user type
+Fill in app name: "Flask OAuth Test"
+Add your email as developer contact
+Save and continue through the steps
+
+
+Back to creating OAuth client ID:
+
+Choose "Web application"
+Name: "Flask OAuth Client"
+Authorized JavaScript origins: http://localhost:5000
+Authorized redirect URIs: http://localhost:5000/callback
+Click "Create"
+
+
+
+1.5 Save Your Credentials
+
+Copy the Client ID and Client Secret
+You'll need these for the next step
+
+Step 2: Set Up Your Local Environment
+2.1 Create Project Directory
+bashmkdir flask-oauth-test
+cd flask-oauth-test
+2.2 Create Virtual Environment
+bash# For Windows
+python -m venv venv
+venv\Scripts\activate
+
+# For Mac/Linux
+python3 -m venv venv
+source venv/bin/activate
+2.3 Install Dependencies
+Save the requirements.txt file and run:
+bashpip install -r requirements.txt
+2.4 Set Up Environment Variables
+
+Copy the .env.example file to .env
+Fill in your actual values:
+
+bashcp .env.example .env
+Edit .env file:
+SECRET_KEY=your-super-secret-random-key-here
+GOOGLE_CLIENT_ID=your-actual-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-actual-client-secret
+2.5 Create a .env Loader (Optional but Recommended)
+Create a file called config.py:
+pythonfrom dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+    GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+Step 3: Run the Application
+3.1 Start the Flask App
+bashpython app.py
+You should see:
+* Running on http://127.0.0.1:5000
+* Debug mode: on
+3.2 Test the Application
+
+Open your browser and go to http://localhost:5000
+Click "Login with Google"
+You'll be redirected to Google's authentication page
+Sign in with your Google account
+Grant permissions to your app
+You should be redirected back to your app, now logged in!
+
+Step 4: Testing Features
+Available Routes:
+
+/ - Home page (shows login status)
+/login - Initiates Google OAuth flow
+/callback - Handles OAuth callback (don't visit directly)
+/profile - Shows user profile data (JSON format)
+/logout - Logs out the user
+/health - Health check endpoint
+
+Test the Flow:
+
+Home Page: Visit / to see login status
+Login: Click login, authenticate with Google
+Profile: Visit /profile to see your user data as JSON
+Logout: Click logout to clear the session
+
+Step 5: Troubleshooting
+Common Issues:
+"OAuth credentials not found" warning:
+
+Make sure your .env file has the correct variable names
+Restart the Flask app after updating .env
+
+"Redirect URI mismatch" error:
+
+Check that your Google Console redirect URI exactly matches http://localhost:5000/callback
+Make sure you're accessing the app via localhost:5000, not 127.0.0.1:5000
+
+"Access blocked" error:
+
+Your OAuth consent screen might not be published
+Add your test email to the test users list in Google Console
+Or publish your OAuth consent screen (for production)
+
+Sessions not working:
+
+Make sure you have a proper SECRET_KEY set
+Check that cookies are enabled in your browser
+
+Step 6: Security Considerations
+For production use, make sure to:
+
+Use a strong, random SECRET_KEY
+Set up proper HTTPS
+Configure proper redirect URIs for your domain
+Review and minimize OAuth scopes
+Implement proper error handling
+Add CSRF protection
+Set secure cookie flags
+
+Project Structure
+flask-oauth-test/
+├── app.py              # Main Flask application
+├── requirements.txt    # Python dependencies
+├── .env               # Environment variables (create this)
+├── .env.example       # Template for environment variables
+└── README.md          # This guide
